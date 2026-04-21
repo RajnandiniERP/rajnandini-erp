@@ -7,11 +7,10 @@ from database import engine, get_db, Base
 import models, schemas, crud, auth
 
 Base.metadata.create_all(bind=engine)
-
 # ── Auto-create admin user if not exists ─────────────────────────
 def _ensure_admin():
-    from sqlalchemy.orm import Session
     from passlib.context import CryptContext
+    from database import SessionLocal
     _pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
     db = SessionLocal()
     try:
@@ -26,13 +25,12 @@ def _ensure_admin():
             )
             db.add(admin)
             db.commit()
-            print("✅ Admin user created automatically")
-        else:
-            print("✅ Admin user already exists")
     except Exception as e:
         print(f"Admin setup error: {e}")
     finally:
         db.close()
+_ensure_admin()
+
 
 from database import SessionLocal
 _ensure_admin()
