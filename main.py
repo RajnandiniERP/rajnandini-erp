@@ -1,8 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.requests import Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from sqlalchemy.orm import Session
 import uvicorn
 import json
@@ -55,8 +52,6 @@ with engine.connect() as _mig:
         Base.metadata.create_all(bind=engine, tables=[models.PhysicalReturn.__table__])
 
 app = FastAPI(title="Rajnandini ERP")
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-templates = Jinja2Templates(directory="app/templates")
 
 @app.post("/api/auth/login")
 def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
@@ -3509,8 +3504,8 @@ def get_physical_returns(
     ]
 
 @app.get("/", response_class=HTMLResponse)
-def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+def index():
+    return FileResponse("index.html")
 
 if __name__ == "__main__":
     import os
