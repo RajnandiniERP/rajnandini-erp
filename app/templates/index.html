@@ -1077,7 +1077,7 @@ tbody tr:last-child td { border-bottom:none; }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const API = '';
+const API = 'https://rajnandini-erp.onrender.com';
 let token = localStorage.getItem('rj_token');
 let currentUser = JSON.parse(localStorage.getItem('rj_user') || 'null');
 
@@ -1091,7 +1091,7 @@ async function doLogin() {
   localStorage.removeItem('rj_user');
   token = null; currentUser = null;
   try {
-    const res = await fetch('/api/auth/login', {
+    const res = await fetch(API + '/api/auth/login', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({username, password})
     });
@@ -2755,7 +2755,7 @@ async function saveNewSkuMapping() {
 async function exportSkuMappings() {
   const t = token || localStorage.getItem('rj_token') || '';
   const unmapped = document.getElementById('smUnmappedOnly').checked;
-  window.location.href = `/api/sku-mappings/export?unmapped_only=${unmapped}&token=${encodeURIComponent(t)}`;
+  window.location.href = `${API}/api/sku-mappings/export?unmapped_only=${unmapped}&token=${encodeURIComponent(t)}`;
 }
 
 async function importSkuMappings(input) {
@@ -2786,7 +2786,7 @@ async function importSkuMappings(input) {
   const t = token || localStorage.getItem('rj_token') || '';
   try {
     setTimeout(() => { bar.style.width = '70%'; }, 300);
-    const res = await fetch('/api/sku-mappings/import', {
+    const res = await fetch(API + '/api/sku-mappings/import', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + t },
       body: fd
@@ -3173,7 +3173,7 @@ window.onload = async () => {
   if (token) {
     // Verify token is still valid
     try {
-      const res = await fetch('/api/company', {
+      const res = await fetch(API + '/api/company', {
         headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer '+token }
       });
       if (res.status === 401) {
