@@ -10,6 +10,19 @@ from database import engine, get_db, Base
 import models, schemas, crud, auth
 
 Base.metadata.create_all(bind=engine)
+# Create default admin user if no users exist
+from passlib.context import CryptContext as _CryptContext
+_pwd = _CryptContext(schemes=["bcrypt"], deprecated="auto")
+with engine.connect() as _uc:
+    try:
+        _count = _uc.execute(_text("SELECT COUNT(*) FROM users")).scalar()
+        if not _count:
+            _uc.execute(_text("""
+                INSERT INTO users (username, password_hash, name, email, role, is_active)
+                VALUES ('admin', :ph, 'Admin', 'admin@rajnandini.com', 'admin', 1)
+            """), {"ph": _pwd.hash("admin123")})
+            _uc.commit()
+    except: pass
 
 # Create indexes for fast dashboard queries
 from sqlalchemy import text as _text
