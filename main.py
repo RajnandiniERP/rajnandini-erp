@@ -8,6 +8,35 @@ import models, schemas, crud, auth
 
 Base.metadata.create_all(bind=engine)
 
+# ── Auto-create admin user if not exists ─────────────────────────
+def _ensure_admin():
+    from sqlalchemy.orm import Session
+    from passlib.context import CryptContext
+    _pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    db = SessionLocal()
+    try:
+        existing = db.query(models.User).filter(models.User.username == "admin").first()
+        if not existing:
+            admin = models.User(
+                username="admin",
+                password_hash=_pwd.hash("Admin@123"),
+                name="Administrator",
+                role="admin",
+                is_active=True
+            )
+            db.add(admin)
+            db.commit()
+            print("✅ Admin user created automatically")
+        else:
+            print("✅ Admin user already exists")
+    except Exception as e:
+        print(f"Admin setup error: {e}")
+    finally:
+        db.close()
+
+from database import SessionLocal
+_ensure_admin()
+
 # Create indexes for fast dashboard queries
 from sqlalchemy import text as _text
 text = _text
